@@ -416,7 +416,6 @@ def clock_plot(
     fig.update_polars(
         angularaxis_tickvals=np.array(range(0, 360, int(360 / 24))),
         angularaxis_ticktext=np.array(range(0, 24)),
-        bgcolor="#f7f5fa",
     )
 
     # Plot the averages (if required)
