@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="clock_plots-YOUR-USERNAME-HERE",
+    name="clock_plots-samyoung-dsci",
     version="0.1",
     author="Samuel Young",
     author_email="samuel.young.work@gmail.com",
