@@ -1,6 +1,6 @@
-## clock_plots
+## clock_plot
 
-clock_plots provides a simple way to visualize timeseries data mapping 24 hours onto the 360 degrees of a polar plot. 
+clock_plot provides a simple way to visualize timeseries data mapping 24 hours onto the 360 degrees of a polar plot. 
 For usage, please see the examples.ipynb Jupyter notebook
 
 Time features are automatically generated for your timeseries
@@ -27,8 +27,8 @@ Examples of this are given in examples.ipynb
 
 ## Installation
 To install this package run:
-pip install /path/to/clock_plots
+pip install /path/to/clock_plot
 
 or to install in editable mode, use:
-pip install -editable /path/to/clock_plots
+pip install -editable /path/to/clock_plot
 
