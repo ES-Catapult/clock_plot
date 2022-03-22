@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="clock_plot",
-    version="0.1.1",
+    version="0.1.3",
     author="Samuel Young",
     author_email="samuel.young.work@gmail.com",
     description="This package provides a simple way to visualize patterns in timeseries data mapping 24 hours onto a polar plot",
@@ -22,4 +22,5 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(),
     python_requires=">=3.7",
+    install_requires=["numpy>=1.20.3", "pandas>=1.3.4", "plotly>=4.0.0", "scipy>=1.7.1"],
 )
