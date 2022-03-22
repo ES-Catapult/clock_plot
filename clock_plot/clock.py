@@ -3,6 +3,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from typing import Union
+import scipy
 import warnings
 
 
