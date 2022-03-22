@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="clock_plot",
-    version="0.1",
+    version="0.1.1",
     author="Samuel Young",
     author_email="samuel.young.work@gmail.com",
     description="This package provides a simple way to visualize patterns in timeseries data mapping 24 hours onto a polar plot",
@@ -20,7 +20,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "clock_plot"},
-    packages=setuptools.find_packages(where="clock_plot"),
+    packages=setuptools.find_packages(),
     python_requires=">=3.7",
 )
