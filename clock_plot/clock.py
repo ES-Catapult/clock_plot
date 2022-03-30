@@ -182,7 +182,7 @@ def filter_and_group_data(
 
     # If columns have been specified that don't exist (or bins_per_day is manually specified) then
     # generate the datatime vars to see if that helps
-    if not set(relevant_cols).issubset(data.columns) or bins_per_day:
+    if not set(relevant_cols).issubset(data.columns) or bins_per_day or len(relevant_cols) == 0:
         data = create_datetime_vars(data, datetime_col, bins_per_day)
     # If there are still missing columns raise an Exception
     if not set(relevant_cols).issubset(data.columns):
@@ -380,7 +380,10 @@ def clock_plot(
     # Plotly struggles to do splines for more than 20 or so curves, so revert to line_shape = linear and do interpolation before hand
     orig_line_shape = line_shape
     columns = [col for col in [color, line_group, line_dash] if col]
-    groups = list(filtered_data.groupby(columns).groups.keys())
+    if len(columns) > 0:
+        groups = list(filtered_data.groupby(columns).groups.keys())
+    else:
+        groups = []
     grp_length = len(groups)
     if grp_length > 20 and line_shape == "spline":
         line_shape = "linear"
