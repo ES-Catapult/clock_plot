@@ -1,10 +1,10 @@
+import warnings
+from typing import Union
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from typing import Union
 import scipy
-import warnings
 
 
 def create_datetime_vars(data_in: pd.DataFrame, datetime_col: str, bins_per_day: int = 24) -> pd.DataFrame:
@@ -51,7 +51,8 @@ def create_datetime_vars(data_in: pd.DataFrame, datetime_col: str, bins_per_day:
     data["hour"] = data[datetime_col].dt.hour
     data["minute"] = data[datetime_col].dt.minute
     data["degrees"] = 360 * data["hour"] / 24
-    # Temporarily keep this methodology, in the long-term this needs fixing to use the binning method for all circumstances
+    # Temporarily keep this methodology, in the long-term this needs fixing to use the binning method for all
+    # circumstances
     if bins_per_day != 24:
         data["degrees"] = data["degrees"] + (360 * data["minute"] / (60 * 24))
         data["degree_bins"] = pd.cut(data["degrees"], bins=bins_per_day)
@@ -97,7 +98,12 @@ def default_category_orders() -> dict:
         "December",
     ]
 
-    category_orders = {"dayofweek": day_order, "weekend": weekend_order, "season": season_order, "month": month_order}
+    category_orders = {
+        "dayofweek": day_order,
+        "weekend": weekend_order,
+        "season": season_order,
+        "month": month_order,
+    }
 
     return category_orders
 
@@ -113,8 +119,9 @@ def create_title(title_start: str, filters: dict, line_group: str):
     Returns:
         str: The title string
     """
-    # Try to tidy up the list of filter values ready for printing in the chart title. This will work for straightforward cases
-    # (single values, non-nested lists) but will fail for nested lists, in which case just give up and don't bother to include it in the title
+    # Try to tidy up the list of filter values ready for printing in the chart title. This will work
+    # for straightforward cases (single values, non-nested lists) but will fail for nested lists, in
+    # which case just give up and don't bother to include it in the title
     if filters:
         try:
             tidied_filter_vals = ""
@@ -129,7 +136,6 @@ def create_title(title_start: str, filters: dict, line_group: str):
             tidied_filter_vals = tidied_filter_vals + " & ".join(
                 [str(y) for x in values if type(x) is list for y in x]
             )
-
         except:
             tidied_filter_vals = ""
 
@@ -161,10 +167,13 @@ def filter_and_group_data(
         data (pd.DataFrame): The data to filter and group
         datetime_col (str): The datetime column name
         value_col (str): The name of the column containing the values to be grouped
-        filters (dict, optional): Dictionary fiters, key-value pairs are column names and values to keep respectively. Defaults to {}.
-        aggregate (_type_, optional): Dictionary containing a single key-value pair used to specify an additional level of aggregation line.
+        filters (dict, optional): Dictionary fiters, key-value pairs are column names and values to keep respectively.
+                                  Defaults to {}.
+        aggregate (_type_, optional): Dictionary containing a single key-value pair used to specify an additional
+                                      level of aggregation line.
                 Key gives column name to aggregate and value gives the aggregation method. Defaults to {None: "mean"}.
-        line_group (str, optional): Name of column to use a the lowest level of grouping when plotting. Defaults to None.
+        line_group (str, optional): Name of column to use a the lowest level of grouping when plotting.
+                                    Defaults to None.
         color (str, optional): Name of column to use to group by color. Defaults to None.
         line_dash (str, optional): Name of column to use to group by line dash. Defaults to None.
         bins_per_day (int, optional): Number of bins to group data into for each hour. Defaults to None.
@@ -212,7 +221,7 @@ def filter_and_group_data(
 
     if (grouped_data[value_col] < 0).any():
         warnings.warn(
-            "Data contains negative values. A plot will be produced but they are often difficult to interpret"
+            "Data contains negative values. A plot will be produced but they are often difficult to" " interpret"
         )
 
     return filtered_data, grouped_data
@@ -237,7 +246,8 @@ def spline_interp(grouped_data: pd.DataFrame, value_col: str, groups: list, grou
         # It only makes sense to interpolate if we have enough data, here we choose 8 points (i.e. 3 hour intervals)
         if len(df) >= 8:
             # Want to put first values at end and last values at start to use for interpolation
-            # We use 3 values as we are doing a cublic spline. This is the minimum needed for good interpolation around 0-360 deg.
+            # We use 3 values as we are doing a cublic spline. This is the minimum needed for good interpolation
+            # around 0-360 deg.
             start = range(0, 3)
             end = range(-3, 0)
             df = pd.concat([pd.DataFrame(df.iloc[end, :]), df, pd.DataFrame(df.iloc[start, :])], axis=0)
@@ -275,11 +285,14 @@ def plot_averages(
         aggregate (dict): Dictionary containing a single key-value pair.
                 Key gives column name to aggregate and value gives the aggregation method.
         color (str): Name of column to use to group by color.
-        line_shape (str, optional): Whether to smooth the lines, one of either 'linear' or 'spline'. Defaults to 'spline'
-        color_discrete_sequence (list, optional): List of colors to use for the chart. Defaults to px.colors.qualitative.G10
-        category_orders (dict, optional): Dictionary where the key-value pairs are column names and a list of values in the desired order.
-                This is used to set relative ordering of categories and is important for fixing line colors and legend orders.
-                Defaults to default_category_orders()
+        line_shape (str, optional): Whether to smooth the lines, one of either 'linear' or 'spline'.
+                                    Defaults to 'spline'
+        color_discrete_sequence (list, optional): List of colors to use for the chart.
+                                                    Defaults to px.colors.qualitative.G10
+        category_orders (dict, optional): Dictionary where the key-value pairs are column names and a list of values
+                                          in the desired order. This is used to set relative ordering of categories
+                                          and is important for fixing line colors and legend orders.
+                                          Defaults to default_category_orders()
 
     Returns:
         go.Figure: The figure with added traces for aggregated data
@@ -335,28 +348,41 @@ def clock_plot(
         data (pandas.DataFrame): DataFrame containing the values to plot as a timeseries
         datetime_col (str): Name of the column containing the datetime
         value_col (str): Name of the column contianing the value to plot
-        filters (dict, optional): Dictionary fiters, key-value pairs are column names and values to keep respectively. Defaults to {}.
+        filters (dict, optional): Dictionary fiters, key-value pairs are column names and values to keep respectively.
+                                  Defaults to {}.
         aggregate (_type_, optional): Dictionary containing a single key-value pair.
-                Key gives column name to aggregate and value gives the aggregation method. Defaults to {None: "mean"}.
-        line_group (str, optional): Name of column to use a the lowest level of grouping when plotting. Defaults to None.
+                                      Key gives column name to aggregate and value gives the aggregation method.
+                                      Defaults to {None: "mean"}.
+        line_group (str, optional): Name of column to use a the lowest level of grouping when plotting.
+                                    Defaults to None.
         color (str, optional): Name of column to use to group by color. Defaults to None.
         line_dash (str, optional): Name of column to use to group by line dash. Defaults to None.
-        line_shape (str, optional): Whether to smooth the lines, one of either 'linear' or 'spline'. Defaults to "spline".
+        line_shape (str, optional): Whether to smooth the lines, one of either 'linear' or 'spline'.
+                                    Defaults to "spline".
         title_start (str, optional): A string to prefix to the automated chart title. Defaults to "".
         title (str, optional): Overrides the automated chart title. Defaults to None.
-        bins_per_day (int, optional): Number of bins to group data into over a day. This is useful when using irregularly spaced datetimes.
-                Defaults to 24.
+        bins_per_day (int, optional): Number of bins to group data into over a day. This is useful when using
+                                      irregularly spaced datetimes. Defaults to 24.
         show (bool, optional): Whether to display the chart after it is generated. Defaults to True.
         color_discrete_sequence (list, optional): List of colors to use for the chart. Defaults to None.
-        category_orders (dict, optional): Dictionary where the key-value pairs are column names and a list of values in the desired order.
-                This is used to set relative ordering of categories and is important for fixing line colors and legend orders. Defaults to {}.
+        category_orders (dict, optional): Dictionary where the key-value pairs are column names and a list of values
+                                          in the desired order. This is used to set relative ordering of categories
+                                          and is important for fixing line colors and legend orders. Defaults to {}.
         **kwargs: Accepts and passes on any arguments accepted by plotly express line_polar()
 
     Returns:
         (plotly.graph_objects.Figure): The generated plotly figure object containing the polar charts.
     """
     filtered_data, grouped_data = filter_and_group_data(
-        data, datetime_col, value_col, filters, aggregate, line_group, color, line_dash, bins_per_day
+        data,
+        datetime_col,
+        value_col,
+        filters,
+        aggregate,
+        line_group,
+        color,
+        line_dash,
+        bins_per_day,
     )
 
     # The order in which categories are plotted determins their colour which we want to be consistent and correct
@@ -377,7 +403,8 @@ def clock_plot(
     if title is None:
         title = create_title(title_start, filters, line_group)
 
-    # Plotly struggles to do splines for more than 20 or so curves, so revert to line_shape = linear and do interpolation before hand
+    # Plotly struggles to do splines for more than 20 or so curves, so revert to line_shape = linear and do
+    # interpolation before hand
     orig_line_shape = line_shape
     columns = [col for col in [color, line_group, line_dash] if col]
     if len(columns) > 0:
@@ -425,7 +452,14 @@ def clock_plot(
     # Plot the averages (if required)
     if list(aggregate.keys())[0] is not None:
         fig = plot_averages(
-            fig, filtered_data, value_col, aggregate, color, orig_line_shape, color_discrete_sequence, category_orders
+            fig,
+            filtered_data,
+            value_col,
+            aggregate,
+            color,
+            orig_line_shape,
+            color_discrete_sequence,
+            category_orders,
         )
 
     if show:
