@@ -1,12 +1,16 @@
 ## clock_plot
 
 clock_plot provides a simple way to visualize timeseries data mapping 24 hours onto the 360 degrees of a polar plot. 
-For usage, please see the examples.ipynb Jupyter notebook
+For usage, please see the [examples.ipynb](examples.ipynb) Jupyter notebook
 
 ![seasonal gas usage clock plot](/data/seasonal_gas_usage.png)
 
-Time features are automatically generated for your timeseries
-These features include:
+## Installation
+To install this package run:
+`pip install clock_plot`
+
+## Available features
+Time features are automatically generated for your timeseries. These features include:
 | Feature    | Type | Description                                                           | Example Values                                                                             |
 | ---------- | ---- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | year       | int  | Calendar year                                                         | 2022                                                                                       |
@@ -26,7 +30,3 @@ These can be used to filter your data and format your plot.
 
 For example you could filter for a particular year, plot seasons with different colors and weekday vs weekend days with different line dashes.
 Examples of this are given in examples.ipynb
-
-## Installation
-To install this package run:
-pip install clock_plot
