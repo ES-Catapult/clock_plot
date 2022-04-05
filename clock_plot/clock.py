@@ -275,13 +275,14 @@ def plot_averages(
     line_shape: str = "spline",
     color_discrete_sequence: list = px.colors.qualitative.G10,
     category_orders: dict = default_category_orders(),
+    mode: str = "polar",
 ):
     """Add traces for the aggregated data
 
     Args:
         fig (go.Figure): The existing figure to which the traces will be added
         data (pd.DataFrame): The data to aggregate
-        value_col (str): Name of the column contianing the value to aggregate
+        value_col (str): Name of the column containing the value to aggregate
         aggregate (dict): Dictionary containing a single key-value pair.
                 Key gives column name to aggregate and value gives the aggregation method.
         color (str): Name of column to use to group by color.
@@ -293,6 +294,7 @@ def plot_averages(
                                           in the desired order. This is used to set relative ordering of categories
                                           and is important for fixing line colors and legend orders.
                                           Defaults to default_category_orders()
+        mode (str, optional): Whether to plot "polar" or "flat" (cartesian). Defaults to "polar".
 
     Returns:
         go.Figure: The figure with added traces for aggregated data
@@ -308,16 +310,27 @@ def plot_averages(
             f"{value} ({agg_fn})" for value in category_orders[agg_col]
         ]
 
-    agg_fig = px.line_polar(
-        agg_data,
-        theta="degrees",
-        r=value_col,
-        color=color,
-        line_close=True,
-        line_shape=line_shape,
-        category_orders=category_orders,
-        color_discrete_sequence=color_discrete_sequence,
-    )
+    if mode == "polar":
+        agg_fig = px.line_polar(
+            agg_data,
+            theta="degrees",
+            r=value_col,
+            color=color,
+            line_close=True,
+            line_shape=line_shape,
+            category_orders=category_orders,
+            color_discrete_sequence=color_discrete_sequence,
+        )
+    else:
+        agg_fig = px.line(
+            agg_data,
+            x="degrees",
+            y=value_col,
+            color=color,
+            line_shape=line_shape,
+            category_orders=category_orders,
+            color_discrete_sequence=color_discrete_sequence,
+        )
     agg_fig.update_traces(line_width=6)
     fig.add_traces(list(agg_fig.select_traces()))
 
@@ -341,6 +354,7 @@ def clock_plot(
     color_discrete_sequence: list = None,
     category_orders: dict = {},
     text_noon: bool = True,
+    mode: str = "polar",
     **kwargs,
 ):
     """Plot a polar chart showing value by hour of day
@@ -348,8 +362,8 @@ def clock_plot(
     Args:
         data (pandas.DataFrame): DataFrame containing the values to plot as a timeseries
         datetime_col (str): Name of the column containing the datetime
-        value_col (str): Name of the column contianing the value to plot
-        filters (dict, optional): Dictionary fiters, key-value pairs are column names and values to keep respectively.
+        value_col (str): Name of the column containing the value to plot
+        filters (dict, optional): Dictionary filters, key-value pairs are column names and values to keep respectively.
                                   Defaults to {}.
         aggregate (_type_, optional): Dictionary containing a single key-value pair.
                                       Key gives column name to aggregate and value gives the aggregation method.
@@ -371,6 +385,7 @@ def clock_plot(
                                           and is important for fixing line colors and legend orders. Defaults to {}.
         text_noon (bool, optional): Whether to replace hours 0 and 12 with "Midnight" and "Noon" respectively.
                                     Defaults to True.
+        mode (str, optional): Whether to plot "polar" or "line" (cartesian). Defaults to "polar".
         **kwargs: Accepts and passes on any arguments accepted by plotly express line_polar()
 
     Returns:
@@ -419,25 +434,59 @@ def clock_plot(
         line_shape = "linear"
         grouped_data = spline_interp(grouped_data, value_col, groups, columns)
 
-    # Default to 800x800 unless size is manually specified
-    if "width" not in kwargs.keys() and "height" not in kwargs.keys():
-        kwargs["width"] = 800
-        kwargs["height"] = 800
+    tick_text = list(range(0, 24))
+    if text_noon:
+        tick_text[0] = "Midnight"
+        tick_text[12] = "Noon"
 
-    fig = px.line_polar(
-        grouped_data,
-        theta="degrees",
-        r=value_col,
-        line_group=line_group,
-        color=color,
-        line_dash=line_dash,
-        line_close=True,
-        line_shape=line_shape,
-        category_orders=category_orders,
-        title=title,
-        color_discrete_sequence=color_discrete_sequence,
-        **kwargs,
-    )
+    if mode == "polar":
+        # Default to 800x800 unless size is manually specified
+        if "width" not in kwargs.keys() and "height" not in kwargs.keys():
+            kwargs["width"] = 800
+            kwargs["height"] = 800
+
+        fig = px.line_polar(
+            grouped_data,
+            theta="degrees",
+            r=value_col,
+            line_group=line_group,
+            color=color,
+            line_dash=line_dash,
+            line_close=True,
+            line_shape=line_shape,
+            category_orders=category_orders,
+            title=title,
+            color_discrete_sequence=color_discrete_sequence,
+            **kwargs,
+        )
+        # Calculate the tickmarks for 24 hour clock
+        fig.update_polars(
+            angularaxis_tickvals=np.array(range(0, 360, int(360 / 24))),
+            angularaxis_ticktext=tick_text,
+        )
+    else:
+        # Default to 800x600 unless size is manually specified
+        if "width" not in kwargs.keys() and "height" not in kwargs.keys():
+            kwargs["width"] = 800
+            kwargs["height"] = 600
+        fig = px.line(
+            grouped_data,
+            x="degrees",
+            y=value_col,
+            line_group=line_group,
+            color=color,
+            line_dash=line_dash,
+            line_shape=line_shape,
+            category_orders=category_orders,
+            title=title,
+            color_discrete_sequence=color_discrete_sequence,
+            **kwargs,
+        )
+        # Calculate the tickmarks for 24 hour clock
+        fig.update_layout(
+            xaxis_tickvals=np.array(range(0, 360, int(360 / 24))),
+            xaxis_ticktext=tick_text,
+        )
 
     # If there are a lot of lines, make them smaller and slightly transparent
     if grp_length > 12:
@@ -445,16 +494,6 @@ def clock_plot(
         fig.update_traces(opacity=0.7)
     elif grp_length <= 8:
         fig.update_traces(line_width=3)
-
-    tick_text = list(range(0, 24))
-    if text_noon:
-        tick_text[0] = "Midnight"
-        tick_text[12] = "Noon"
-    # Calculate the tickmarks for 24 hour clock
-    fig.update_polars(
-        angularaxis_tickvals=np.array(range(0, 360, int(360 / 24))),
-        angularaxis_ticktext=tick_text,
-    )
 
     # Plot the averages (if required)
     if list(aggregate.keys())[0] is not None:
@@ -467,6 +506,7 @@ def clock_plot(
             orig_line_shape,
             color_discrete_sequence,
             category_orders,
+            mode,
         )
 
     if show:

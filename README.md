@@ -30,3 +30,19 @@ These can be used to filter your data and format your plot.
 
 For example you could filter for a particular year, plot seasons with different colors and weekday vs weekend days with different line dashes.
 Examples of this are given in examples.ipynb
+
+## When should you use these plots?
+Radar/polar plots (of which clock plots are a special case) are [much maligned by visualisation experts](https://www.data-to-viz.com/caveat/spider.html), and for good reason. Whilst some of the common limitations are overcome with clock plots, two key ones remain:
+1. It is harder to read quantitative values than on a linear axis
+2. Areas scale quadratically (with the square of the value) rather than linearly, which can lead to overestimation of differences
+
+Clock plots are therefore most suited for cases where understanding absolute values is less important and one or more of the following is true:
+- behaviour around midnight is particularly important
+- there are a 2-3 daily peaks and understanding at a glance when those are occurring is more important than their exact magnitude
+- you want a distinctive, eye-catching graphic to engage people with your work
+
+Note that they are particularly poorly suited to:
+- timeseries with negative values (the radial axis becomes very unintuitive)
+- timeseries with little within day variation (you just get circles!)
+
+If you're not sure which is best for a particular use case, you can quickly toggle between a clock plot and a linear plot by adding `mode="line"` to your clock_plot call.
