@@ -136,7 +136,7 @@ def create_title(title_start: str, filters: dict, line_group: str):
             tidied_filter_vals = tidied_filter_vals + " & ".join(
                 [str(y) for x in values if type(x) is list for y in x]
             )
-        except:
+        except Exception:
             tidied_filter_vals = ""
 
     title = "by Hour of Day"
@@ -340,6 +340,7 @@ def clock_plot(
     show: bool = True,
     color_discrete_sequence: list = None,
     category_orders: dict = {},
+    text_noon: bool = True,
     **kwargs,
 ):
     """Plot a polar chart showing value by hour of day
@@ -368,6 +369,8 @@ def clock_plot(
         category_orders (dict, optional): Dictionary where the key-value pairs are column names and a list of values
                                           in the desired order. This is used to set relative ordering of categories
                                           and is important for fixing line colors and legend orders. Defaults to {}.
+        text_noon (bool, optional): Whether to replace hours 0 and 12 with "Midnight" and "Noon" respectively.
+                                    Defaults to True.
         **kwargs: Accepts and passes on any arguments accepted by plotly express line_polar()
 
     Returns:
@@ -443,10 +446,14 @@ def clock_plot(
     elif grp_length <= 8:
         fig.update_traces(line_width=3)
 
+    tick_text = list(range(0, 24))
+    if text_noon:
+        tick_text[0] = "Midnight"
+        tick_text[12] = "Noon"
     # Calculate the tickmarks for 24 hour clock
     fig.update_polars(
         angularaxis_tickvals=np.array(range(0, 360, int(360 / 24))),
-        angularaxis_ticktext=np.array(range(0, 24)),
+        angularaxis_ticktext=tick_text,
     )
 
     # Plot the averages (if required)
