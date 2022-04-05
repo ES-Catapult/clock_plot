@@ -1,3 +1,5 @@
+0.2.1 - Add the ability to easily toggle back to an ordinary line plot
+
 0.2 - Default to showing 0 and 12 as "Midnight" and "Noon". Can revert to numbers with text_noon=False
 
 0.1.4 - Fix bug where plotting using just datetime_col and value_col didn't work.

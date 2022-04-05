@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="clock_plot",
-    version="0.2",
+    version="0.2.1",
     author="Samuel Young",
     author_email="samuel.young.work@gmail.com",
     description="This package provides a simple way to visualize patterns in timeseries data mapping 24 hours onto a polar plot",
